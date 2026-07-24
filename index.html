@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心語籤 Fortune Whisper｜文青風情緒療癒抽籤</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+  /* ============ 變數 Design Tokens ============ */
+  :root{
+    --color-primary:#D8B892;      /* 奶茶色 */
+    --color-primary-soft:#EAD9BE; /* 奶茶淺 */
+    --color-secondary:#F7F4EF;    /* 米白 */
+    --color-paper:#FCFAF6;        /* 卡片底 */
+    --color-accent:#6B7A58;       /* 森林綠 */
+    --color-accent-deep:#525E44;  /* 深森林綠 */
+    --color-text:#3E312C;         /* 深咖啡 */
+    --color-text-soft:#8A7A6C;    /* 淺咖啡輔助文字 */
+    --color-border:#E4D8C4;
+    --color-rose:#C79B8C;         /* 點綴莓紅，用於收藏/心 */
+    --shadow-soft:0 10px 30px rgba(62,49,44,0.08);
+    --shadow-card:0 6px 18px rgba(62,49,44,0.10);
+    --radius-lg:28px;
+    --radius-md:18px;
+    --radius-sm:10px;
+    --font-display:'Cormorant Garamond','Noto Serif TC',serif;
+    --font-body:'Noto Sans TC',-apple-system,'PingFang TC',sans-serif;
+    --font-script:'Zhi Mang Xing','Cormorant Garamond',cursive;
+    --nav-h:76px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font-body);
+    background:var(--color-secondary);
+    color:var(--color-text);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{
+    font-family:var(--font-display);
+    font-weight:600;
+    margin:0;
+    letter-spacing:.02em;
+  }
+  p{margin:0;}
+  button{font-family:inherit;cursor:pointer;}
+  a{color:inherit;}
+  ::selection{background:var(--color-primary-soft);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  :focus-visible{
+    outline:2px solid var(--color-accent);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+
+  /* ============ 背景水彩氛圍 ============ */
+  .bg-wash{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .bg-wash .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(50px);
+    opacity:.45;
+  }
+  .bg-wash .b1{width:420px;height:420px;background:var(--color-primary-soft);top:-140px;left:-120px;}
+  .bg-wash .b2{width:360px;height:360px;background:#DCE3CE;bottom:-100px;right:-100px;}
+  .bg-wash .b3{width:260px;height:260px;background:#F0E3D0;top:40%;right:10%;opacity:.35;}
+
+  .leaf-float{
+    position:absolute;
+    opacity:.55;
+    animation:drift 14s ease-in-out infinite;
+  }
+  @keyframes drift{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-18px) rotate(6deg);}
+  }
+
+  /* ============ App Shell ============ */
+  #app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  header.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 24px 14px;
+    max-width:760px;
+    margin:0 auto;
+    width:100%;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo svg{width:30px;height:30px;color:var(--color-accent);}
+  .logo-text h1{font-size:22px;color:var(--color-text);}
+  .logo-text span{
+    display:block;
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:11px;
+    letter-spacing:.12em;
+    color:var(--color-text-soft);
+  }
+  nav.top-nav{
+    display:none;
+    gap:6px;
+  }
+  nav.top-nav button{
+    background:none;
+    border:none;
+    padding:8px 14px;
+    font-size:14px;
+    color:var(--color-text-soft);
+    border-radius:20px;
+    transition:.25s;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  nav.top-nav button.active,
+  nav.top-nav button:hover{
+    background:var(--color-primary-soft);
+    color:var(--color-text);
+  }
+
+  main{
+    flex:1;
+    max-width:760px;
+    margin:0 auto;
+    width:100%;
+    padding:6px 20px calc(var(--nav-h) + 40px);
+    position:relative;
+  }
+
+  .view{
+    display:none;
+  }
+  .view.active{
+    display:block;
+    animation:fadeSlide .5s ease both;
+  }
+  @keyframes fadeSlide{
+    from{opacity:0; transform:translateY(14px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ============ 共用元件 ============ */
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--color-accent-deep);
+    font-family:var(--font-body);
+    font-weight:500;
+    margin-bottom:6px;
+    display:block;
+  }
+  .card{
+    background:var(--color-paper);
+    border:1px solid var(--color-border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-card);
+    padding:28px;
+  }
+  .btn{
+    border:none;
+    border-radius:999px;
+    padding:15px 30px;
+    font-size:15px;
+    font-weight:500;
+    letter-spacing:.04em;
+    transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-primary{
+    background:var(--color-accent);
+    color:var(--color-secondary);
+    box-shadow:0 8px 20px rgba(107,122,88,.28);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 24px rgba(107,122,88,.34);}
+  .btn-ghost{
+    background:transparent;
+    color:var(--color-text);
+    border:1px solid var(--color-border);
+  }
+  .btn-ghost:hover{background:var(--color-primary-soft); border-color:var(--color-primary-soft);}
+  .btn-block{width:100%; justify-content:center;}
+  .btn[disabled]{opacity:.4; cursor:not-allowed; transform:none !important;}
+
+  hr.rule{
+    border:none;
+    border-top:1px solid var(--color-border);
+    margin:26px 0;
+  }
+
+  /* ============ 首頁 ============ */
+  .hero{
+    text-align:center;
+    padding:26px 6px 10px;
+  }
+  .hero .mark{
+    width:64px;height:64px;
+    margin:0 auto 18px;
+    color:var(--color-accent);
+  }
+  .hero h1{
+    font-size:clamp(30px,7vw,42px);
+    line-height:1.2;
+  }
+  .hero .sub{
+    font-family:var(--font-display);
+    font-style:italic;
+    color:var(--color-text-soft);
+    font-size:15px;
+    letter-spacing:.08em;
+    margin-top:6px;
+  }
+
+  .quote-card{
+    margin-top:28px;
+    text-align:center;
+    padding:34px 26px;
+    position:relative;
+  }
+  .quote-card .quote-text{
+    font-family:var(--font-script);
+    font-size:clamp(20px,5vw,26px);
+    line-height:1.9;
+    color:var(--color-text);
+  }
+  .quote-card .quote-mark{
+    font-family:var(--font-display);
+    font-size:46px;
+    color:var(--color-primary);
+    line-height:0;
+    display:block;
+    margin-bottom:10px;
+  }
+
+  .cta-wrap{
+    margin-top:26px;
+    text-align:center;
+  }
+
+  .energy-card{
+    margin-top:20px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:20px 24px;
+  }
+  .energy-swatch{
+    width:52px;height:52px;
+    border-radius:50%;
+    flex-shrink:0;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);
+  }
+  .energy-info .eyebrow{margin-bottom:2px;}
+  .energy-info h3{font-size:20px;}
+  .energy-info p{font-size:13px; color:var(--color-text-soft); margin-top:2px;}
+
+  footer.site-footer{
+    text-align:center;
+    padding:34px 20px 10px;
+    font-size:12px;
+    color:var(--color-text-soft);
+    letter-spacing:.05em;
+  }
+
+  /* ============ 主題選擇 ============ */
+  .section-heading{margin-bottom:20px;}
+  .section-heading h2{font-size:26px;}
+  .section-heading p{color:var(--color-text-soft); font-size:13.5px; margin-top:6px;}
+
+  .theme-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .theme-card{
+    background:var(--color-paper);
+    border:1.5px solid var(--color-border);
+    border-radius:var(--radius-md);
+    padding:20px 16px;
+    text-align:left;
+    transition:.25s;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .theme-card svg{width:26px;height:26px;color:var(--color-accent);}
+  .theme-card h3{font-size:17px; font-weight:600; font-family:var(--font-body);}
+  .theme-card p{font-size:12px; color:var(--color-text-soft); line-height:1.5;}
+  .theme-card:hover{border-color:var(--color-accent); transform:translateY(-3px); box-shadow:var(--shadow-card);}
+  .theme-card.selected{
+    border-color:var(--color-accent);
+    background:linear-gradient(180deg, rgba(107,122,88,.08), transparent 60%);
+    box-shadow:var(--shadow-card);
+  }
+
+  /* ============ 抽籤動畫頁 ============ */
+  .draw-stage{
+    text-align:center;
+    padding:20px 6px 10px;
+  }
+  .jar-wrap{
+    width:220px;
+    margin:14px auto 22px;
+    position:relative;
+  }
+  .jar-wrap svg{width:100%;height:auto;}
+  .stick{
+    transform-origin:50% 100%;
+  }
+  .jar-wrap.shaking svg .stick{
+    animation:shake 0.5s ease-in-out infinite;
+  }
+  @keyframes shake{
+    0%,100%{transform:rotate(0deg);}
+    25%{transform:rotate(-3deg) translateX(-2px);}
+    75%{transform:rotate(3deg) translateX(2px);}
+  }
+  .jar-wrap.rise svg .stick-drawn{
+    animation:riseUp 0.9s cubic-bezier(.2,.9,.3,1.2) forwards;
+  }
+  @keyframes riseUp{
+    0%{transform:translateY(0) rotate(0deg); opacity:1;}
+    60%{transform:translateY(-120px) rotate(-8deg); opacity:1;}
+    100%{transform:translateY(-220px) rotate(-14deg); opacity:0;}
+  }
+  .draw-hint{
+    font-size:13px;
+    color:var(--color-text-soft);
+    margin-bottom:22px;
+  }
+
+  /* ============ 結果頁 ============ */
+  .result-card{
+    text-align:center;
+    padding:38px 26px 30px;
+    position:relative;
+  }
+  .result-card .cat-tag{
+    display:inline-block;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    color:var(--color-accent-deep);
+    background:var(--color-primary-soft);
+    padding:5px 14px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+  .stars{
+    color:var(--color-primary);
+    font-size:18px;
+    letter-spacing:3px;
+    margin-bottom:18px;
+  }
+  .stars .off{color:var(--color-border);}
+  .poem{
+    font-family:var(--font-display);
+    font-size:clamp(19px,4.6vw,23px);
+    line-height:2.15;
+    color:var(--color-text);
+    margin-bottom:6px;
+  }
+  .poem span{display:block;}
+
+  .result-block{
+    text-align:left;
+    margin-top:26px;
+    padding-top:22px;
+    border-top:1px dashed var(--color-border);
+  }
+  .result-block + .result-block{border-top:1px dashed var(--color-border); margin-top:20px; padding-top:20px;}
+  .result-block .label{
+    font-size:12px;
+    letter-spacing:.12em;
+    color:var(--color-accent-deep);
+    font-weight:600;
+    margin-bottom:8px;
+    display:block;
+  }
+  .result-block p{font-size:14.5px; line-height:1.85; color:var(--color-text);}
+  .blessing-line{
+    font-family:var(--font-script);
+    font-size:19px;
+    color:var(--color-accent-deep);
+    line-height:1.8;
+  }
+
+  .result-actions{
+    display:flex;
+    gap:10px;
+    margin-top:30px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .icon-btn{
+    background:var(--color-secondary);
+    border:1px solid var(--color-border);
+    border-radius:999px;
+    padding:11px 20px;
+    font-size:13.5px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:.2s;
+  }
+  .icon-btn svg{width:16px;height:16px;}
+  .icon-btn:hover{border-color:var(--color-accent); color:var(--color-accent-deep);}
+  .icon-btn.active{background:var(--color-rose); border-color:var(--color-rose); color:#fff;}
+
+  /* ============ 收藏 / 足跡 列表 ============ */
+  .list-item{
+    background:var(--color-paper);
+    border:1px solid var(--color-border);
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    margin-bottom:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:14px;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .list-item:hover{border-color:var(--color-accent); transform:translateX(3px);}
+  .list-item .li-main .cat{
+    font-size:11px;
+    color:var(--color-accent-deep);
+    letter-spacing:.08em;
+    margin-bottom:4px;
+    display:block;
+  }
+  .list-item .li-main .line1{
+    font-family:var(--font-display);
+    font-size:17px;
+    color:var(--color-text);
+  }
+  .list-item .li-main .date{
+    font-size:11.5px;
+    color:var(--color-text-soft);
+    margin-top:6px;
+    display:block;
+  }
+  .list-item .li-remove{
+    background:none;
+    border:none;
+    color:var(--color-text-soft);
+    padding:4px;
+    flex-shrink:0;
+  }
+  .list-item .li-remove:hover{color:var(--color-rose);}
+  .list-item .li-remove svg{width:16px;height:16px;}
+
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--color-text-soft);
+  }
+  .empty-state svg{width:44px;height:44px;color:var(--color-primary); margin-bottom:14px;}
+  .empty-state p{font-size:14px; line-height:1.7;}
+
+  /* ============ 底部導覽 ============ */
+  nav.bottom-nav{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:var(--nav-h);
+    background:rgba(252,250,246,.92);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--color-border);
+    display:flex;
+    z-index:5;
+  }
+  nav.bottom-nav button{
+    flex:1;
+    background:none;
+    border:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    color:var(--color-text-soft);
+    font-size:11px;
+    letter-spacing:.03em;
+    transition:.2s;
+  }
+  nav.bottom-nav button svg{width:21px;height:21px;}
+  nav.bottom-nav button.active{color:var(--color-accent-deep);}
+  nav.bottom-nav button .dot{
+    width:4px;height:4px;border-radius:50%;
+    background:var(--color-accent);
+    margin-top:1px;
+    opacity:0;
+  }
+  nav.bottom-nav button.active .dot{opacity:1;}
+
+  /* ============ Modal (分享) ============ */
+  .modal-mask{
+    position:fixed; inset:0;
+    background:rgba(62,49,44,.42);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:20;
+  }
+  .modal-mask.show{display:flex; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+  .modal-box{
+    background:var(--color-paper);
+    width:100%;
+    max-width:520px;
+    border-radius:24px 24px 0 0;
+    padding:26px 24px 34px;
+    animation:slideUp .35s cubic-bezier(.2,.9,.3,1.1);
+  }
+  @media (min-width:640px){
+    .modal-mask{align-items:center;}
+    .modal-box{border-radius:24px;}
+  }
+  @keyframes slideUp{from{transform:translateY(40px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  .modal-box h3{font-size:18px; margin-bottom:14px;}
+  .modal-box textarea{
+    width:100%;
+    min-height:150px;
+    border:1px solid var(--color-border);
+    border-radius:14px;
+    padding:14px;
+    font-family:var(--font-body);
+    font-size:13.5px;
+    color:var(--color-text);
+    background:var(--color-secondary);
+    resize:none;
+    line-height:1.8;
+  }
+  .modal-actions{
+    display:flex; gap:10px; margin-top:16px;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:18px;
+    background:none;border:none;color:var(--color-text-soft);
+    font-size:20px;
+  }
+  .modal-box{position:relative;}
+  .toast{
+    position:fixed;
+    bottom:calc(var(--nav-h) + 18px);
+    left:50%;
+    transform:translateX(-50%) translateY(10px);
+    background:var(--color-text);
+    color:var(--color-secondary);
+    padding:11px 20px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:.3s;
+    z-index:30;
+    white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* ============ RWD：桌機 ============ */
+  @media (min-width:860px){
+    :root{--nav-h:0px;}
+    nav.bottom-nav{display:none;}
+    nav.top-nav{display:flex;}
+    main{padding-bottom:60px;}
+    .theme-grid{grid-template-columns:repeat(4,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-wash" aria-hidden="true">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <svg class="leaf-float" style="top:14%;left:6%;width:34px;" viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 2C8 14 4 30 20 58C36 30 32 14 20 2Z" stroke="#8B9A76" stroke-width="1.2"/>
+    <path d="M20 8V52" stroke="#8B9A76" stroke-width="1"/>
+  </svg>
+  <svg class="leaf-float" style="top:60%;right:7%;width:26px; animation-delay:3s;" viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 2C8 14 4 30 20 58C36 30 32 14 20 2Z" stroke="#C7B48C" stroke-width="1.2"/>
+    <path d="M20 8V52" stroke="#C7B48C" stroke-width="1"/>
+  </svg>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="logo">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 4C13 12 9 20 20 36C31 20 27 12 20 4Z" stroke="currentColor" stroke-width="1.4"/><path d="M20 10V30" stroke="currentColor" stroke-width="1.1"/></svg>
+      <div class="logo-text">
+        <h1>心語籤</h1>
+        <span>FORTUNE WHISPER</span>
+      </div>
+    </div>
+    <nav class="top-nav" id="topNav">
+      <button data-view="home">首頁</button>
+      <button data-view="select">抽籤</button>
+      <button data-view="favorites">收藏</button>
+      <button data-view="footprints">我的足跡</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ============ 首頁 ============ -->
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <svg class="mark" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M30 4C16 18 10 30 30 56C50 30 44 18 30 4Z" stroke="currentColor" stroke-width="1.3"/><path d="M30 12V46" stroke="currentColor" stroke-width="1"/></svg>
+        <h1>今天，先安放心情</h1>
+        <p class="sub">A gentle pause before the day unfolds</p>
+      </div>
+
+      <div class="card quote-card">
+        <span class="quote-mark">“</span>
+        <p class="quote-text" id="dailyQuote"></p>
+      </div>
+
+      <div class="cta-wrap">
+        <button class="btn btn-primary" id="btnStartDraw">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M7 8l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          開始抽籤
+        </button>
+      </div>
+
+      <div class="card energy-card">
+        <div class="energy-swatch" id="energySwatch"></div>
+        <div class="energy-info">
+          <span class="eyebrow">今日能量 · Today's Energy</span>
+          <h3 id="energyWord"></h3>
+          <p id="energyDesc"></p>
+        </div>
+      </div>
+
+      <footer class="site-footer">
+        Designed with Heart. Inspired by Nature.<br>
+        以心設計，以自然為啟發。
+      </footer>
+    </section>
+
+    <!-- ============ 選擇主題 ============ -->
+    <section class="view" id="view-select">
+      <div class="section-heading">
+        <span class="eyebrow">Choose a Theme</span>
+        <h2>今天，想聽聽哪方面的心語？</h2>
+        <p>選一個此刻最貼近你的主題，靜下心，準備抽一張籤。</p>
+      </div>
+      <div class="theme-grid" id="themeGrid"></div>
+      <div class="cta-wrap" style="margin-top:30px;">
+        <button class="btn btn-primary" id="btnGoDraw" disabled>抽一張籤</button>
+      </div>
+    </section>
+
+    <!-- ============ 抽籤動畫 ============ -->
+    <section class="view" id="view-draw">
+      <div class="draw-stage">
+        <span class="eyebrow" id="drawCatLabel">今日運勢</span>
+        <h2 style="margin-bottom:6px;">靜下心，輕輕搖一搖籤筒</h2>
+        <p class="draw-hint">點擊籤筒，抽出屬於今天的一支籤</p>
+        <div class="jar-wrap" id="jarWrap">
+          <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g class="stick stick-drawn"><rect x="96" y="20" width="4" height="120" rx="2" fill="#6B7A58"/><circle cx="98" cy="18" r="4" fill="#D8B892"/></g>
+            <g class="stick"><rect x="86" y="46" width="4" height="96" rx="2" fill="#93A37D" transform="rotate(-6 88 46)"/></g>
+            <g class="stick"><rect x="112" y="46" width="4" height="96" rx="2" fill="#93A37D" transform="rotate(7 114 46)"/></g>
+            <g class="stick"><rect x="76" y="50" width="4" height="90" rx="2" fill="#B7C09F" transform="rotate(-12 78 50)"/></g>
+            <g class="stick"><rect x="124" y="50" width="4" height="90" rx="2" fill="#B7C09F" transform="rotate(13 126 50)"/></g>
+            <path d="M40 140C40 130 46 124 60 124H140C154 124 160 130 160 140V206C160 220 148 230 132 230H68C52 230 40 220 40 206V140Z" fill="#F7F4EF" stroke="#6B7A58" stroke-width="1.6"/>
+            <path d="M44 148C60 156 140 156 156 148" stroke="#D8B892" stroke-width="1.2"/>
+            <ellipse cx="100" cy="132" rx="60" ry="10" fill="#EAD9BE" stroke="#6B7A58" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <button class="btn btn-primary btn-block" id="btnDraw" style="max-width:280px;margin:0 auto;">抽一張籤</button>
+      </div>
+    </section>
+
+    <!-- ============ 結果 ============ -->
+    <section class="view" id="view-result">
+      <div class="card result-card" id="resultCard">
+        <span class="cat-tag" id="resultCat">今日運勢</span>
+        <div class="stars" id="resultStars"></div>
+        <div class="poem" id="resultPoem"></div>
+
+        <div class="result-block">
+          <span class="label">解籤 · Reading</span>
+          <p id="resultInterp"></p>
+        </div>
+        <div class="result-block">
+          <span class="label">今日建議 · Advice</span>
+          <p id="resultAdvice"></p>
+        </div>
+        <div class="result-block">
+          <span class="label">療癒文字 · A Whisper for You</span>
+          <p class="blessing-line" id="resultBlessing"></p>
+        </div>
+
+        <div class="result-actions">
+          <button class="icon-btn" id="btnFav">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.5-9C.8 7.4 3 4 6.5 4c2 0 3.5 1.2 4.5 2.6C12 5.2 13.5 4 15.5 4 19 4 21.2 7.4 19.5 11 17 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            收藏
+          </button>
+          <button class="icon-btn" id="btnShare">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.4" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="6" r="2.4" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="18" r="2.4" stroke="currentColor" stroke-width="1.5"/><path d="M8.1 10.8 15.9 7.2M8.1 13.2 15.9 16.8" stroke="currentColor" stroke-width="1.5"/></svg>
+            分享
+          </button>
+          <button class="icon-btn" id="btnRedraw">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.6 5.9M4 12V6M4 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            重新抽
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 收藏 ============ -->
+    <section class="view" id="view-favorites">
+      <div class="section-heading">
+        <span class="eyebrow">Saved</span>
+        <h2>收藏的籤</h2>
+        <p>那些讓你想再讀一次的話語，都留在這裡。</p>
+      </div>
+      <div id="favoritesList"></div>
+    </section>
+
+    <!-- ============ 我的足跡 ============ -->
+    <section class="view" id="view-footprints">
+      <div class="section-heading">
+        <span class="eyebrow">Your Journey</span>
+        <h2>我的足跡</h2>
+        <p>回顧每一次靜下心來，與自己對話的時刻。</p>
+      </div>
+      <div id="footprintsList"></div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-view="home">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      首頁<span class="dot"></span>
+    </button>
+    <button data-view="select">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v14M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15c0-1.5 1-2.5 2.5-2.5h9C18 12.5 19 13.5 19 15v3.5C19 20 17.8 21 16.3 21H7.7C6.2 21 5 20 5 18.5V15Z" stroke="currentColor" stroke-width="1.6"/></svg>
+      抽籤<span class="dot"></span>
+    </button>
+    <button data-view="favorites">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.5-9C.8 7.4 3 4 6.5 4c2 0 3.5 1.2 4.5 2.6C12 5.2 13.5 4 15.5 4 19 4 21.2 7.4 19.5 11 17 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      收藏<span class="dot"></span>
+    </button>
+    <button data-view="footprints">
+      <svg viewBox="0 0 24 24" fill="none"><ellipse cx="9" cy="8" rx="2.6" ry="3.4" stroke="currentColor" stroke-width="1.5"/><ellipse cx="16" cy="14" rx="2.6" ry="3.4" stroke="currentColor" stroke-width="1.5"/></svg>
+      足跡<span class="dot"></span>
+    </button>
+  </nav>
+</div>
+
+<div class="modal-mask" id="shareModal">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <h3>分享這張籤</h3>
+    <textarea id="shareText" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCopy" style="flex:1;justify-content:center;">複製文字</button>
+      <button class="btn btn-primary" id="btnNativeShare" style="flex:1;justify-content:center;">分享</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ 資料 Local JSON ============ */
+  var CATEGORIES = [
+    { key:"today",  label:"今日運勢", desc:"感受今天整體的能量與提醒",
+      icon:'<path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/>' },
+    { key:"love",   label:"愛情",     desc:"關於愛、關係與自我照顧",
+      icon:'<path d="M12 20s-7-4.4-9.5-9C.8 7.4 3 4 6.5 4c2 0 3.5 1.2 4.5 2.6C12 5.2 13.5 4 15.5 4 19 4 21.2 7.4 19.5 11 17 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' },
+    { key:"career", label:"工作",     desc:"職涯、努力與方向的提醒",
+      icon:'<rect x="4" y="8" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/>' },
+    { key:"life",   label:"人生方向", desc:"迷惘時，重新靠近自己",
+      icon:'<path d="M4 20c4-10 12-10 16-16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="19" cy="5" r="2" stroke="currentColor" stroke-width="1.5"/>' }
+  ];
+
+  var FORTUNES = {
+    today:[
+      { level:5, poem:["晨光穿過雲隙間，","不急不徐向前走。","心若安穩步亦穩，","今日自有好時候。"],
+        interpretation:"今天的能量偏向平穩安定，適合把步調放慢，專注在眼前的小事上。",
+        advice:"別急著把待辦事項全部完成，先深呼吸三次，讓自己回到當下。",
+        blessing:"你不需要追趕誰，你的節奏本身就很好。" },
+      { level:3, poem:["風有時候會轉彎，","心也可以慢慢彎。","莫把烏雲當結局，","天光總在雲後面。"],
+        interpretation:"今天可能會遇到一些小小的阻礙或情緒起伏，但這不是全部的故事。",
+        advice:"如果感覺卡住了，換個角度、換個空間，都有可能讓思路重新流動。",
+        blessing:"陰天不代表沒有光，只是光在休息。" },
+      { level:4, poem:["一杯茶的溫度裡，","藏著今日的答案。","不必凡事都看透，","慢慢感受慢慢談。"],
+        interpretation:"今天適合放慢腳步，用感受代替分析，很多事情不需要立刻有結論。",
+        advice:"給自己泡一杯喜歡的飲品，讓身體先安定，心才會跟著安定。",
+        blessing:"你允許自己慢，世界不會因此把你落下。" },
+      { level:4, poem:["路上有塵也有光，","兩者皆是風景一場。","不必只選其中一種，","完整的你才最動人。"],
+        interpretation:"今天可能同時經歷順利與不順利，這是很正常的，不需要用「好」或「壞」來簡化整天。",
+        advice:"試著在備忘錄寫下今天最真實的三個片刻，不論好壞。",
+        blessing:"你的複雜與矛盾，也是你溫柔的一部分。" },
+      { level:5, poem:["種子不急著長成樹，","它先學會在土裡待著。","你也不必急著開花，","安靜生長也是一種答案。"],
+        interpretation:"今天的重點不在「產出」，而在「累積」，看似沒有進展，其實正在扎根。",
+        advice:"如果今天覺得自己很普通、沒什麼特別，那也沒關係，普通的日子也在滋養你。",
+        blessing:"你正在成為自己的路上，不需要交出成果單。" }
+    ],
+    love:[
+      { level:4, poem:["潮水總有來去時，","愛也需要呼吸的空隙。","靠近不必用力抓緊，","遠一點也是一種靠近。"],
+        interpretation:"這段感情目前需要一些空間感，不代表關係變淡，而是需要彼此喘息。",
+        advice:"如果最近覺得對方有點疏離，先別急著解讀成「不愛了」，可以直接、溫柔地問。",
+        blessing:"值得被愛的你，也值得先好好愛自己。" },
+      { level:5, poem:["兩顆星星各自亮，","偶爾交會成一道光。","不必時時刻刻相依，","獨立也能靠得很近。"],
+        interpretation:"健康的關係裡，兩個人仍然各自完整，這是穩定而長久的徵兆。",
+        advice:"花點時間投資自己的興趣與朋友，這會讓你們的關係更有活力，而不是更疏遠。",
+        blessing:"你不需要為了誰而縮小自己。" },
+      { level:3, poem:["心裡有話別悶著，","說出口才有機會被聽見。","沉默久了會結成霜，","溫度需要語言去融化。"],
+        interpretation:"最近的感情議題可能卡在「沒有說出口」，累積的情緒容易變成誤會。",
+        advice:"找一個安靜、不趕時間的時刻，把心裡真正的感受說出來，而不是繞圈子。",
+        blessing:"誠實地表達，是對這段關係最溫柔的照顧。" },
+      { level:4, poem:["還沒遇見的人，","此刻也正在成為更好的自己。","你不是在等待，","你是在完整自己的路上。"],
+        interpretation:"若目前單身，這是在提醒你，感情不是人生的等待室，而是與自己相處的延伸。",
+        advice:"把談戀愛的心力，先分一些給自己喜歡的事，讓自己成為更靠近喜歡的模樣。",
+        blessing:"你值得被好好愛，也值得先好好愛自己。" },
+      { level:3, poem:["傷口癒合需要時間，","不必催促自己快點好。","慢慢來，也是一種勇敢，","你已經走得比想像中遠。"],
+        interpretation:"如果最近正在走出一段感情，這張籤想告訴你，療傷沒有標準時間表。",
+        advice:"允許自己偶爾難過，也允許自己偶爾笑出來，兩者可以同時存在。",
+        blessing:"你正在好起來的路上，即使今天感覺不到。" }
+    ],
+    career:[
+      { level:4, poem:["石頭不是一天被磨圓，","努力也常常看不見形狀。","但每一次的堅持，","都在悄悄鋪成你的路。"],
+        interpretation:"工作上的努力可能暫時看不到明顯成果，但累積正在發生。",
+        advice:"今天可以花五分鐘，寫下這個月你完成的三件小事，重新看見自己的進度。",
+        blessing:"沒有被看見的努力，也依然算數。" },
+      { level:3, poem:["帆需要等風，","你需要等時機。","現在的停頓不是後退，","是在調整方向。"],
+        interpretation:"如果最近工作卡關或猶豫不決，這是準備期，而不是失敗。",
+        advice:"與其逼自己立刻做決定，不如先蒐集更多資訊，讓答案自然浮現。",
+        blessing:"慢一點決定，不代表你不夠好。" },
+      { level:5, poem:["你不需要成為每個人，","只需要成為完整的自己。","擅長的事會發光，","不擅長的也無需苛責。"],
+        interpretation:"工作上如果有比較心態，這張籤提醒你，你的價值不需要靠比較來證明。",
+        advice:"列出三件自己擅長、也喜歡的事，試著把更多時間分配給它們。",
+        blessing:"你本來的樣子，已經足夠有價值。" },
+      { level:3, poem:["迷路的路上，","也可能發現新的風景。","方向感會慢慢回來，","先別急著責怪自己。"],
+        interpretation:"若最近對職涯方向感到迷惘，這是很多人都會經歷的階段，不代表你做錯了什麼。",
+        advice:"找一個信任的人聊聊，說出口的困惑，常常比悶在心裡更容易看清。",
+        blessing:"迷路也是探索的一部分，你並不孤單。" },
+      { level:4, poem:["今天的辛苦，","會成為明天的底氣。","你走的每一步，","都在為自己打地基。"],
+        interpretation:"這段時間可能比較忙碌辛苦，但這些累積會轉化成未來的能力與自信。",
+        advice:"記得在忙碌之中留給自己一小段休息時間，哪怕只有十分鐘。",
+        blessing:"辛苦的你，值得被好好照顧。" }
+    ],
+    life:[
+      { level:4, poem:["不是所有的路，","都要一次走到底。","你可以走走停停，","方向依然在你心裡。"],
+        interpretation:"人生不需要一次規劃到位，允許自己邊走邊調整，是一種智慧而非猶豫。",
+        advice:"與其問「我該做什麼」，不如問「我現在需要什麼」，答案會更貼近你自己。",
+        blessing:"你不需要有標準答案，才能好好前進。" },
+      { level:4, poem:["河流從不問終點，","只是順著地勢往前流。","你也可以先往前走，","方向會在路上慢慢清楚。"],
+        interpretation:"如果對未來感到不確定，這張籤提醒你，方向可以邊走邊找，不必先想清楚才出發。",
+        advice:"選一件今天就能做、朝著模糊方向前進的小事去做，比想破頭更有用。",
+        blessing:"你正在路上，這已經很足夠。" },
+      { level:5, poem:["今天不是答案的一天，","而是相信自己的開始。","不必急著看見全貌，","先相信自己值得抵達。"],
+        interpretation:"這是一張提醒你「暫時不知道也沒關係」的籤，重點不在找到答案，而在對自己保持信任。",
+        advice:"今天可以練習對自己說一句肯定的話，即使還沒看到具體成果。",
+        blessing:"相信自己，是所有旅程最重要的行李。" },
+      { level:3, poem:["你走過的每一段路，","都不是白走的。","就算繞了遠路，","也在途中認識了自己。"],
+        interpretation:"如果覺得自己走了很多彎路，這張籤想告訴你，那些經歷仍然有意義。",
+        advice:"回頭看看過去一年，寫下三件你因為某次「繞路」而學到的事。",
+        blessing:"你不是繞遠路，你是用自己的方式抵達。" },
+      { level:5, poem:["種子有自己的花期，","你也有自己的時區。","不必和別人比快慢，","準時綻放的永遠是你自己。"],
+        interpretation:"這是一張關於「不需要和別人比較時程」的提醒，你的人生節奏本來就與眾不同。",
+        advice:"試著把「應該幾歲做到什麼」的想法放下一天，單純問自己現在想要什麼。",
+        blessing:"你的花期，由你自己決定。" }
+    ]
+  };
+
+  var DAILY_QUOTES = [
+    "今天不是答案的一天，而是相信自己的開始。",
+    "願你走得慢一點，但走得踏實。",
+    "不完美的日子，也值得被溫柔對待。",
+    "慢慢來，你已經比自己以為的更好。",
+    "允許自己休息，休息也是前進的一種方式。",
+    "你不需要成為誰，只需要成為自己。",
+    "今天，先照顧好心裡那個小小的自己。",
+    "有些答案，急不得，只能慢慢等它靠近。",
+    "願你所擁有的，都是你所喜歡的。",
+    "平凡的一天，也可以很珍貴。"
+  ];
+
+  var ENERGIES = [
+    { word:"沉靜", en:"Calm",     color:"#B8C4A6", desc:"適合放慢腳步，讓思緒沉澱下來。" },
+    { word:"溫柔", en:"Tender",   color:"#E3C7BA", desc:"對自己與他人，都多一點耐心與體諒。" },
+    { word:"扎根", en:"Rooted",   color:"#C7B48C", desc:"專注眼前的累積，不必急著看見成果。" },
+    { word:"流動", en:"Flowing",  color:"#A9C1CE", desc:"順著感覺走，答案會在路上慢慢浮現。" },
+    { word:"柔軟", en:"Soft",     color:"#EAD9BE", desc:"允許自己有情緒，不必時刻堅強。" },
+    { word:"回歸", en:"Returning",color:"#9FAE8C", desc:"適合停下來，重新靠近自己真正的需要。" },
+    { word:"綻放", en:"Blooming", color:"#D9B7A3", desc:"是時候把準備好的自己，勇敢展現出來。" },
+    { word:"休憩", en:"Resting",  color:"#DCD3C3", desc:"今天，允許自己什麼都不做也沒關係。" }
+  ];
+
+  /* ============ 狀態（僅存於本次瀏覽階段） ============ */
+  var state = {
+    favorites: [],
+    history: [],
+    currentCategory: null,
+    currentFortune: null,
+    idCounter: 1
+  };
+
+  function dayOfYear(){
+    var now = new Date();
+    var start = new Date(now.getFullYear(), 0, 0);
+    var diff = now - start;
+    return Math.floor(diff / 86400000);
+  }
+
+  /* ============ 導覽 ============ */
+  var VIEWS = ["home","select","draw","result","favorites","footprints"];
+  function showView(name){
+    VIEWS.forEach(function(v){
+      document.getElementById("view-"+v).classList.toggle("active", v===name);
+    });
+    document.querySelectorAll("nav.top-nav button, nav.bottom-nav button").forEach(function(btn){
+      var target = btn.dataset.view === "draw" ? "select" : btn.dataset.view;
+      var current = (name==="draw"||name==="result") ? "select" : name;
+      btn.classList.toggle("active", target===current);
+    });
+    window.scrollTo({top:0, behavior:"smooth"});
+    if(name==="favorites") renderFavorites();
+    if(name==="footprints") renderFootprints();
+    if(name==="select") renderThemeGrid();
+  }
+
+  document.querySelectorAll("nav.top-nav button, nav.bottom-nav button").forEach(function(btn){
+    btn.addEventListener("click", function(){ showView(btn.dataset.view); });
+  });
+
+  /* ============ 首頁渲染 ============ */
+  function renderHome(){
+    var doy = dayOfYear();
+    document.getElementById("dailyQuote").textContent = DAILY_QUOTES[doy % DAILY_QUOTES.length];
+    var e = ENERGIES[doy % ENERGIES.length];
+    document.getElementById("energySwatch").style.background = e.color;
+    document.getElementById("energyWord").textContent = e.word + " · " + e.en;
+    document.getElementById("energyDesc").textContent = e.desc;
+  }
+  document.getElementById("btnStartDraw").addEventListener("click", function(){ showView("select"); });
+
+  /* ============ 主題選擇 ============ */
+  function renderThemeGrid(){
+    var grid = document.getElementById("themeGrid");
+    grid.innerHTML = "";
+    CATEGORIES.forEach(function(cat){
+      var el = document.createElement("button");
+      el.className = "theme-card" + (state.currentCategory===cat.key ? " selected":"");
+      el.innerHTML = '<svg viewBox="0 0 24 24" fill="none">'+cat.icon+'</svg><h3>'+cat.label+'</h3><p>'+cat.desc+'</p>';
+      el.addEventListener("click", function(){
+        state.currentCategory = cat.key;
+        renderThemeGrid();
+        document.getElementById("btnGoDraw").disabled = false;
+      });
+      grid.appendChild(el);
+    });
+  }
+  document.getElementById("btnGoDraw").addEventListener("click", function(){
+    if(!state.currentCategory) return;
+    var cat = CATEGORIES.filter(function(c){return c.key===state.currentCategory;})[0];
+    document.getElementById("drawCatLabel").textContent = cat.label;
+    var jar = document.getElementById("jarWrap");
+    jar.classList.remove("shaking","rise");
+    showView("draw");
+  });
+
+  /* ============ 抽籤動畫 ============ */
+  document.getElementById("btnDraw").addEventListener("click", function(e){
+    var jar = document.getElementById("jarWrap");
+    var btn = e.currentTarget;
+    btn.disabled = true;
+    jar.classList.add("shaking");
+    setTimeout(function(){
+      jar.classList.remove("shaking");
+      jar.classList.add("rise");
+      setTimeout(function(){
+        btn.disabled = false;
+        jar.classList.remove("rise");
+        drawFortune();
+        showView("result");
+      }, 650);
+    }, 900);
+  });
+
+  function pickFortune(catKey){
+    var list = FORTUNES[catKey];
+    var idx = Math.floor(Math.random()*list.length);
+    return list[idx];
+  }
+
+  function drawFortune(){
+    var catKey = state.currentCategory;
+    var cat = CATEGORIES.filter(function(c){return c.key===catKey;})[0];
+    var f = pickFortune(catKey);
+    var record = {
+      id: state.idCounter++,
+      catKey: catKey,
+      catLabel: cat.label,
+      fortune: f,
+      date: new Date()
+    };
+    state.currentFortune = record;
+    state.history.unshift(record);
+    renderResult(record);
+  }
+
+  function starsHTML(level){
+    var out = "";
+    for(var i=1;i<=5;i++){
+      out += i<=level ? "★" : '<span class="off">★</span>';
+    }
+    return out;
+  }
+
+  function renderResult(record){
+    var f = record.fortune;
+    document.getElementById("resultCat").textContent = record.catLabel;
+    document.getElementById("resultStars").innerHTML = starsHTML(f.level);
+    document.getElementById("resultPoem").innerHTML = f.poem.map(function(l){return "<span>"+l+"</span>";}).join("");
+    document.getElementById("resultInterp").textContent = f.interpretation;
+    document.getElementById("resultAdvice").textContent = f.advice;
+    document.getElementById("resultBlessing").textContent = f.blessing;
+    updateFavButton();
+  }
+
+  function isFavorited(record){
+    return state.favorites.some(function(r){ return r.fortune===record.fortune; });
+  }
+  function updateFavButton(){
+    var btn = document.getElementById("btnFav");
+    var active = state.currentFortune && isFavorited(state.currentFortune);
+    btn.classList.toggle("active", !!active);
+    btn.innerHTML = (active ?
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-9.5-9C.8 7.4 3 4 6.5 4c2 0 3.5 1.2 4.5 2.6C12 5.2 13.5 4 15.5 4 19 4 21.2 7.4 19.5 11 17 15.6 12 20 12 20Z"/></svg> 已收藏'
+      : '<svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-9.5-9C.8 7.4 3 4 6.5 4c2 0 3.5 1.2 4.5 2.6C12 5.2 13.5 4 15.5 4 19 4 21.2 7.4 19.5 11 17 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg> 收藏');
+  }
+
+  document.getElementById("btnFav").addEventListener("click", function(){
+    if(!state.currentFortune) return;
+    if(isFavorited(state.currentFortune)){
+      state.favorites = state.favorites.filter(function(r){ return r.fortune!==state.currentFortune.fortune; });
+      showToast("已從收藏移除");
+    } else {
+      state.favorites.unshift(state.currentFortune);
+      showToast("已加入收藏");
+    }
+    updateFavButton();
+  });
+
+  document.getElementById("btnRedraw").addEventListener("click", function(){
+    showView("select");
+  });
+
+  /* ============ 分享 ============ */
+  var shareModal = document.getElementById("shareModal");
+  document.getElementById("btnShare").addEventListener("click", function(){
+    if(!state.currentFortune) return;
+    var f = state.currentFortune.fortune;
+    var text = "心語籤 Fortune Whisper\n【"+state.currentFortune.catLabel+"】\n\n"
+      + f.poem.join("\n") + "\n\n" + f.blessing;
+    document.getElementById("shareText").value = text;
+    shareModal.classList.add("show");
+  });
+  document.getElementById("modalClose").addEventListener("click", function(){ shareModal.classList.remove("show"); });
+  shareModal.addEventListener("click", function(e){ if(e.target===shareModal) shareModal.classList.remove("show"); });
+
+  document.getElementById("btnCopy").addEventListener("click", function(){
+    var ta = document.getElementById("shareText");
+    ta.select();
+    ta.setSelectionRange(0, 99999);
+    var ok = false;
+    try{ ok = document.execCommand("copy"); }catch(e){ ok = false; }
+    if(navigator.clipboard && !ok){
+      navigator.clipboard.writeText(ta.value).then(function(){ showToast("已複製到剪貼簿"); }).catch(function(){ showToast("請手動選取文字複製"); });
+    } else {
+      showToast(ok ? "已複製到剪貼簿" : "請手動選取文字複製");
+    }
+  });
+  document.getElementById("btnNativeShare").addEventListener("click", function(){
+    var text = document.getElementById("shareText").value;
+    if(navigator.share){
+      navigator.share({ title:"心語籤 Fortune Whisper", text:text }).catch(function(){});
+    } else {
+      showToast("此瀏覽器不支援原生分享，請使用「複製文字」");
+    }
+  });
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+
+  /* ============ 收藏列表 ============ */
+  function fmtDate(d){
+    var mm = d.getMonth()+1, dd = d.getDate();
+    var hh = String(d.getHours()).padStart(2,"0"), mi = String(d.getMinutes()).padStart(2,"0");
+    return mm+"/"+dd+" "+hh+":"+mi;
+  }
+
+  function renderFavorites(){
+    var wrap = document.getElementById("favoritesList");
+    if(state.favorites.length===0){
+      wrap.innerHTML = emptyStateHTML("還沒有收藏的籤","抽到喜歡的話語時，按下「收藏」，就會出現在這裡。");
+      return;
+    }
+    wrap.innerHTML = "";
+    state.favorites.forEach(function(record){
+      wrap.appendChild(buildListItem(record, true));
+    });
+  }
+
+  function renderFootprints(){
+    var wrap = document.getElementById("footprintsList");
+    if(state.history.length===0){
+      wrap.innerHTML = emptyStateHTML("還沒有抽籤紀錄","開始你的第一次抽籤，足跡會留在這裡。");
+      return;
+    }
+    wrap.innerHTML = "";
+    state.history.forEach(function(record){
+      wrap.appendChild(buildListItem(record, false));
+    });
+  }
+
+  function emptyStateHTML(title, sub){
+    return '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4C7 10 4 16 12 22C20 16 17 10 12 4Z" stroke="currentColor" stroke-width="1.4"/></svg><p><strong style="display:block;margin-bottom:6px;color:var(--color-text);font-family:var(--font-display);font-size:18px;">'+title+'</strong>'+sub+'</p></div>';
+  }
+
+  function buildListItem(record, isFavList){
+    var item = document.createElement("div");
+    item.className = "list-item";
+    item.innerHTML = '<div class="li-main">'
+      + '<span class="cat">'+record.catLabel+'</span>'
+      + '<div class="line1">'+record.fortune.poem[0]+'</div>'
+      + '<span class="date">'+fmtDate(record.date)+'</span>'
+      + '</div>'
+      + '<button class="li-remove" aria-label="移除"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>';
+    item.querySelector(".li-main").addEventListener("click", function(){
+      state.currentFortune = record;
+      renderResult(record);
+      showView("result");
+    });
+    item.querySelector(".li-remove").addEventListener("click", function(e){
+      e.stopPropagation();
+      if(isFavList){
+        state.favorites = state.favorites.filter(function(r){ return r!==record; });
+        renderFavorites();
+      } else {
+        state.history = state.history.filter(function(r){ return r!==record; });
+        renderFootprints();
+      }
+    });
+    return item;
+  }
+
+  /* ============ 初始化 ============ */
+  renderHome();
+  renderThemeGrid();
+  showView("home");
+
+})();
+</script>
+</body>
+</html>
